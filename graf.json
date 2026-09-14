@@ -1,0 +1,75 @@
+{
+    "Nyíregyháza": {
+        "Nagyhalász": 29,
+        "Nagykálló": 15,
+        "Bakta": 34,
+        "Kisvárda": 59
+    },
+
+    "Nagyhalász": {
+        "Nyíregyháza": 29,
+        "Kisvárda": 40
+    },
+
+    "Nagykálló": {
+        "Nyíregyháza": 15,
+        "Nyírbátor": 27
+    },
+
+    "Kisvárda": {
+        "Nagyhalász": 40,
+        "Nyíregyháza": 59,
+        "Záhony": 29,
+        "Vásárosnamény": 31
+    },
+
+    "Záhony": {
+        "Kisvárda": 29
+    },
+
+    "Bakta": {
+        "Nyíregyháza": 34,
+        "Rohod": 7,
+        "Nyírbátor": 20
+    },
+
+    "Rohod": {
+        "Bakta": 7,
+        "Vásárosnamény": 27,
+        "Mátészalka": 29
+    },
+
+    "Vásárosnamény": {
+        "Kisvárda": 31,
+        "Rohod": 27,
+        "Mátészalka": 28,
+        "Fehérgyarmat": 30
+    },
+
+    "Nyírbátor": {
+        "Nagykálló": 27,
+        "Bakta": 20,
+        "Mátészalka": 25,
+        "Nagyecsed": 31
+    },
+
+    "Mátészalka": {
+        "Rohod": 29,
+        "Vásárosnamény": 28,
+        "Nyírbátor": 25,
+        "Fehérgyarmat": 25,
+        "Nagyecsed": 22
+    },
+
+    "Fehérgyarmat": {
+        "Vásárosnamény": 30,
+        "Mátészalka": 25,
+        "Nagyecsed": 21
+    },
+
+    "Nagyecsed": {
+        "Nyírbátor": 31,
+        "Mátészalka": 22,
+        "Fehérgyarmat": 21
+    }
+}
