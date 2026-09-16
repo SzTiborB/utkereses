@@ -44,5 +44,6 @@ for varos, szomszedok in graf.items():
 
 
 print("####Fügvény hívva ####")
-bejart_varosok = fg.A_star("Nagykálló","Záhony",graf,pos)
-fg.utvonal_animacio(G,pos,bejart_varosok)
+bejartutvonal=fg.A_star("Nagykálló","Záhony",graf,pos)
+#bejart_varosok = fg.A_star("Nagykálló","Záhony",graf,pos)
+fg.utvonal_animacio(G,pos,bejartutvonal)

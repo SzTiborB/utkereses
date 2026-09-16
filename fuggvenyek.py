@@ -2,45 +2,53 @@ import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 
+
+def get_tavolsag(varos1,varos2,pos):
+    tav = np.sqrt( (pos[varos1][0]-pos[varos2][0])**2 + (pos[varos1][1]-pos[varos2][1])**2)
+    return tav
+
+
 def A_star(start_city,end_city,graf,pos):
-    bejart_varosok_lista = [start_city]
+    lehetseges_lepesek = {(start_city,): 1}
     megtett_tav=0
     is_finished = False
+    #hogy ne lehessen visszalépni már bejárt csomópontra
+    bejart_varosok = [start_city]
 
-    def get_tavolsag(varos1,varos2,pos):
-        tav = np.sqrt( (pos[varos1][0]-pos[varos2][0])**2 + (pos[varos1][1]-pos[varos2][1])**2)
-        return tav
+    while is_finished == False:
+        for kulcs in list(lehetseges_lepesek.keys()): #az összes feltárt útvonal
+            if kulcs[-1] == start_city: #fejtse ki azokat az útvonalakat amiknek a vége az a város amin éppen állok
+                for szomszed in graf[start_city]: # a mostani város szomszédait nézzük meg
+                    if szomszed not in bejart_varosok: # ne léphessünk olyan városra ahol már voltunk
+                        lehetseges_lepesek[kulcs+(szomszed,)]=0 #előzetesen csak berakjuk a feltárt utakat
+                del lehetseges_lepesek[kulcs] # ezt az utat tovább feltártuk, ezt a feltáratlan változatot töröljük
 
-    def A_star_next_step(start_city,end_city,graf):
-        lehetseges_lepesek = {}
-        for szomszed, tavolsag in graf[start_city].items():
-            
+        #A feltárt utakhoz távot és heurisztikus távot adunk
+        for lepesek in lehetseges_lepesek:
+            tav = 0
+            for i in range(len(lepesek)-1):
+                aktualis_varosok_tav=get_tavolsag(lepesek[i],lepesek[i+1],pos)
+                tav += aktualis_varosok_tav
+                #print(f"TÁV-ELLENŐRZÉS: {lepesek[i]} - {lepesek[i+1]} : {aktualis_varosok_tav}")
+            heur_tav = get_tavolsag(lepesek[-1],end_city,pos)
+            lehetseges_lepesek[lepesek]=tav+heur_tav
+            print(f"{lepesek} - {(tav+heur_tav):.2f}")
 
-            heur_tav = get_tavolsag(szomszed,end_city,pos)
-            ut_tav = get_tavolsag(start_city,szomszed,pos)
-            ossztav = float(heur_tav+ut_tav) #alapból np.double
-            lehetseges_lepesek[szomszed]=ossztav
-            print(f"Lehetseges lepes: {szomszed} - {ossztav}")
-        kovetkezo_varos = min(lehetseges_lepesek, key=lehetseges_lepesek.get)
-        print(f"LÉPÉS {start_city}-ről {kovetkezo_varos}-ra")
-        return kovetkezo_varos,lehetseges_lepesek[kovetkezo_varos]
+        #Kiválasztjuk a legjobb opciót
+        kovetkezo_varos =  min(lehetseges_lepesek, key=lehetseges_lepesek.get)[-1]
+        print(f"LÉPÉS {kovetkezo_varos}-ra/re")
+        megtett_tav += get_tavolsag(start_city,kovetkezo_varos,pos)
+        start_city = kovetkezo_varos
+        bejart_varosok.append(start_city)
 
-    varos,lepes_tav = A_star_next_step(start_city,end_city,graf)
-    bejart_varosok_lista.append(varos)
-    start_city = varos
-    megtett_tav += lepes_tav
-    if varos == end_city:
-        is_finished = True
-    while not is_finished:
-        varos,lepes_tav = A_star_next_step(start_city,end_city,graf)
-        bejart_varosok_lista.append(varos)
-        start_city = varos
-        megtett_tav += lepes_tav
-        if varos == end_city:
+        #Ha célba értünk válasszuk ki a legjobb opciót
+        if start_city == end_city:
             is_finished = True
-    #print(f"celba erve ezen az utvonalon: {bejart_varosok_lista}, tav: {megtett_tav}")
-    print("A* veget ert")
-    return bejart_varosok_lista
+            legjobb_utvonal = min(lehetseges_lepesek, key=lehetseges_lepesek.get)
+            print("CELBA ERVE")
+            print(f"Legjobb utvonal: {legjobb_utvonal}")
+    return legjobb_utvonal
+
 
 def utvonal_animacio(G, pos, utvonal):
     plt.ion()   # interaktív mód bekapcsolása
