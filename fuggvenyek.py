@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
-
+import time
 
 def get_tavolsag(varos1,varos2,pos):
     tav = np.sqrt( (pos[varos1][0]-pos[varos2][0])**2 + (pos[varos1][1]-pos[varos2][1])**2)
@@ -15,6 +15,10 @@ def A_star(start_city,end_city,graf,pos):
     #hogy ne lehessen visszalépni már bejárt csomópontra
     bejart_varosok = [start_city]
 
+    #részletes megjelenítéshez kell a felderítés menete
+    felderites_menete = {}
+
+    j=0
     while is_finished == False:
         for kulcs in list(lehetseges_lepesek.keys()): #az összes feltárt útvonal
             if kulcs[-1] == start_city: #fejtse ki azokat az útvonalakat amiknek a vége az a város amin éppen állok
@@ -23,6 +27,9 @@ def A_star(start_city,end_city,graf,pos):
                         lehetseges_lepesek[kulcs+(szomszed,)]=0 #előzetesen csak berakjuk a feltárt utakat
                 del lehetseges_lepesek[kulcs] # ezt az utat tovább feltártuk, ezt a feltáratlan változatot töröljük
 
+
+        felderites_menete[j]={}
+        felderites_menete[j]["nemvalasztott"]={}
         #A feltárt utakhoz távot és heurisztikus távot adunk
         for lepesek in lehetseges_lepesek:
             tav = 0
@@ -33,9 +40,11 @@ def A_star(start_city,end_city,graf,pos):
             heur_tav = get_tavolsag(lepesek[-1],end_city,pos)
             lehetseges_lepesek[lepesek]=tav+heur_tav
             print(f"{lepesek} - {(tav+heur_tav):.2f}")
+            felderites_menete[j]["nemvalasztott"][lepesek]=tav+heur_tav
 
         #Kiválasztjuk a legjobb opciót
         kovetkezo_varos =  min(lehetseges_lepesek, key=lehetseges_lepesek.get)[-1]
+        felderites_menete[j]["valasztott"]=min(lehetseges_lepesek, key=lehetseges_lepesek.get)
         print(f"LÉPÉS {kovetkezo_varos}-ra/re")
         megtett_tav += get_tavolsag(start_city,kovetkezo_varos,pos)
         start_city = kovetkezo_varos
@@ -45,9 +54,10 @@ def A_star(start_city,end_city,graf,pos):
         if start_city == end_city:
             is_finished = True
             legjobb_utvonal = min(lehetseges_lepesek, key=lehetseges_lepesek.get)
-            print("CELBA ERVE")
-            print(f"Legjobb utvonal: {legjobb_utvonal}")
-    return legjobb_utvonal
+            #print("CELBA ERVE")
+            #print(f"Legjobb utvonal: {legjobb_utvonal}")
+        j += 1
+    return legjobb_utvonal,felderites_menete
 
 
 def utvonal_animacio(G, pos, utvonal):

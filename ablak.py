@@ -18,7 +18,7 @@ G = nx.Graph()
 with open("graf.json", "r", encoding="utf-8") as file:
     graf = json.load(file)
 # Matplotlib Figure létrehozása
-fig = Figure(figsize=(6, 4), dpi=100)
+fig = Figure(figsize=(8,4), dpi=100)
 #pozíció manuális megadása:
 pos = {
     "Nyíregyháza": (0, 2),
@@ -41,14 +41,82 @@ for varos, szomszedok in graf.items():
        G.add_edge(varos, szomszed)
 #endregion
 
+#region - rajzolas fuggvenyek
+def utvonal_rajzolas(bejart_varosok):
+    for i in range(len(bejart_varosok)):
+        # eddig bejárt élek
+        piros_elek = []
+        for j in range(i):
+            piros_elek.append(
+                (bejart_varosok[j], bejart_varosok[j + 1])
+            )
+        # piros élek rárajzolása
+        nx.draw_networkx_edges(
+            G,
+            pos,
+            edgelist=piros_elek,
+            edge_color="red",
+            width=3,
+            ax=ax
+        )
+        canvas.draw()
+        ablak.update()
+        time.sleep(1)
+
+def reszletes_utvonal_rajzolas(bejart_varosok,menet):
+    print("#### kijelzes inditasa ####")
+    for i in range(len(menet)):
+        print(f"Választott út: {menet[i]["valasztott"]}")
+        print("Nem választott")
+        for utvonal in menet[i]["nemvalasztott"]:
+            print(f"-- {utvonal}")
+
+    for i in range(len(menet)): # végigmegy a megoldás lépésein
+
+        for utvonal in menet[i]["nemvalasztott"]: # 1 lépés összes lehetséges opcióján végigmegy pirossal
+
+            ax.clear()
+            nx.draw(G,pos,with_labels=True,ax=ax)
+            piros_elek = list(zip(utvonal[:-1], utvonal[1:]))
+            # piros élek rárajzolása
+            nx.draw_networkx_edges(G,pos,edgelist=piros_elek,edge_color="red",width=3,ax=ax)
+            canvas.draw()
+            ablak.update()
+            time.sleep(0.2)
+
+        #majd zölddel kijelzi a választott utat
+        ax.clear()
+        nx.draw(G,pos,with_labels=True,ax=ax)
+        valasztott_utvonal = menet[i]["valasztott"]
+        zold_elek = list(zip(valasztott_utvonal[:-1], valasztott_utvonal[1:]))
+        nx.draw_networkx_edges(G,pos,edgelist=zold_elek,edge_color="green",width=3,ax=ax)
+        canvas.draw()
+        ablak.update()
+        time.sleep(0.6)
+        
+#endregion
+
 #region - GOMB FUNCTION
 def gomb_function():
+
+    #
+    ax.clear()
+    nx.draw(
+    G,
+    pos,
+    with_labels=True,
+    ax=ax)
+
     start_city = kezdo_lista.get()
     end_city = cel_lista.get()
-    print(f"Kezdo: {start_city}, Cel: {end_city}")
+    #print(f"Kezdo: {start_city}, Cel: {end_city}")
 
-    bejart_varosok = fg.A_star(start_city,end_city,graf,pos)
-    print(f"bejart varosok: {bejart_varosok}")
+    bejart_varosok,menet = fg.A_star(start_city,end_city,graf,pos)
+    #print(f"bejart varosok: {bejart_varosok}")
+
+    #RAJZOLJUK KI AZ UTVONALAT
+    time.sleep(0.2)
+    reszletes_utvonal_rajzolas(bejart_varosok,menet)
 #endregion
 
 # subplot
@@ -80,9 +148,9 @@ varosok = list(G.nodes)
 
 
 #label-ek
-kezdo_label = ttk.Label(vezerlo_frame,text="Kezdő város:")
+kezdo_label = ttk.Label(vezerlo_frame,text="Kezdő város:",font=("Arial", 12))
 kezdo_label.grid(row=0, column=0,pady=5)
-end_label = ttk.Label(vezerlo_frame,text="Cél város:")
+end_label = ttk.Label(vezerlo_frame,text="Cél város:",font=("Arial", 12))
 end_label.grid(row=1,column=0,pady=5)
 
 #legordulo list-ák
@@ -92,7 +160,7 @@ cel_lista = ttk.Combobox(vezerlo_frame,values=varosok,state="readonly")
 cel_lista.grid(row=1,column=1,pady=5)
 
 #gomb
-inditas_gomb = ttk.Button(vezerlo_frame,text="Keresés indítása",command=gomb_function)
+inditas_gomb = ttk.Button(vezerlo_frame,text="Keresés indítása",command=gomb_function,width=20)
 inditas_gomb.grid(row=2,column=0,columnspan=2)
 #endregion
 #-----------------------
