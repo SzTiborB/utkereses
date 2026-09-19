@@ -110,19 +110,25 @@ def gomb_function():
     pos,
     with_labels=True,
     ax=ax)
-
+    status_label.config(text="Keresés folyamatban")
     start_city = kezdo_lista.get()
     end_city = cel_lista.get()
-    #print(f"Kezdo: {start_city}, Cel: {end_city}")
+    algoritmus = kereso_lista.get()
 
-    bejart_varosok,menet = fg.A_star(start_city,end_city,graf,pos)
-    #print(f"bejart varosok: {bejart_varosok}")
+    if algoritmus == "A*":
+        bejart_varosok,menet = fg.A_star(start_city,end_city,graf,pos)
+    elif algoritmus == "Dijkstra":
+        bejart_varosok,menet = fg.Dijkstra(start_city,end_city,graf,pos)
 
     #RAJZOLJUK KI AZ UTVONALAT
     time.sleep(0.2)
     reszletes_utvonal_rajzolas(bejart_varosok,menet)
+    status_label.config(text="Célba ért")
+
 #endregion
 
+# DIAGRAM ABLAKBA ILLESZTÉSE
+#region 
 # subplot
 ax = fig.add_subplot(111)
 #ABLAK KETTÉOSZTÁSA - GRÁF/VEZÉRLŐ részekre
@@ -144,6 +150,7 @@ nx.draw(
 canvas = FigureCanvasTkAgg(fig, master=graf_frame)
 #canvas.get_tk_widget().pack(fill="both",expand=True) - ez nem tudom mit csinál
 canvas.draw()
+#endregion
 
 #-----------------------
 #region---VEZÉRLŐ ELEMEK
@@ -157,15 +164,26 @@ kezdo_label.grid(row=0, column=0,pady=5)
 end_label = ttk.Label(vezerlo_frame,text="Cél város:",font=("Arial", 12))
 end_label.grid(row=1,column=0,pady=5)
 
+kereso_padding =ttk.Label(vezerlo_frame,text="              ",font=("Arial", 12))
+kereso_padding.grid(row=0,column=2,pady=5)
+kereso_label = ttk.Label(vezerlo_frame,text="Algoritmus:",font=("Arial", 12))
+kereso_label.grid(row=0,column=3,pady=5)
+
+status_label = ttk.Label(vezerlo_frame,text="Keresés kiválasztása folyamatban",font=("Arial", 12))
+status_label.grid(row=3,column=0,columnspan=4)
+
 #legordulo list-ák
 kezdo_lista = ttk.Combobox(vezerlo_frame,values=varosok,state="readonly")
 kezdo_lista.grid(row=0, column=1,pady=5)
 cel_lista = ttk.Combobox(vezerlo_frame,values=varosok,state="readonly")
 cel_lista.grid(row=1,column=1,pady=5)
 
+kereso_lista=ttk.Combobox(vezerlo_frame,values=["A*","Dijkstra"],state="readonly")
+kereso_lista.grid(row=0,column=4,pady=5)
+
 #gomb
 inditas_gomb = ttk.Button(vezerlo_frame,text="Keresés indítása",command=gomb_function,width=20)
-inditas_gomb.grid(row=2,column=0,columnspan=2)
+inditas_gomb.grid(row=2,column=0,columnspan=4)
 #endregion
 #-----------------------
 
