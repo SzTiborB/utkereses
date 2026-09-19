@@ -70,9 +70,9 @@ def reszletes_utvonal_rajzolas(bejart_varosok,menet):
         print("Nem választott")
         for utvonal in menet[i]["nemvalasztott"]:
             print(f"-- {utvonal}")
-
+    zold_elek =[]
     for i in range(len(menet)): # végigmegy a megoldás lépésein
-
+        
         for utvonal in menet[i]["nemvalasztott"]: # 1 lépés összes lehetséges opcióján végigmegy pirossal
 
             ax.clear()
@@ -80,6 +80,9 @@ def reszletes_utvonal_rajzolas(bejart_varosok,menet):
             piros_elek = list(zip(utvonal[:-1], utvonal[1:]))
             # piros élek rárajzolása
             nx.draw_networkx_edges(G,pos,edgelist=piros_elek,edge_color="red",width=3,ax=ax)
+
+            #az aktuális zöld út maradjon megrajzolva
+            nx.draw_networkx_edges(G,pos,edgelist=zold_elek,edge_color="green",width=3,ax=ax)
             canvas.draw()
             ablak.update()
             time.sleep(0.2)
@@ -88,6 +91,7 @@ def reszletes_utvonal_rajzolas(bejart_varosok,menet):
         ax.clear()
         nx.draw(G,pos,with_labels=True,ax=ax)
         valasztott_utvonal = menet[i]["valasztott"]
+        zold_elek = []
         zold_elek = list(zip(valasztott_utvonal[:-1], valasztott_utvonal[1:]))
         nx.draw_networkx_edges(G,pos,edgelist=zold_elek,edge_color="green",width=3,ax=ax)
         canvas.draw()
